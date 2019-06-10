@@ -116,6 +116,9 @@
       <dir>D:\labs\PycharmProjects\FinReport\finreport\static</dir>
     </dirStrings>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -152,7 +155,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1092" />
@@ -364,12 +367,12 @@
       <workItem from="1559720995081" duration="48000" />
       <workItem from="1559722327983" duration="12692000" />
       <workItem from="1559803720147" duration="13712000" />
-      <workItem from="1560146250684" duration="1022000" />
+      <workItem from="1560146250684" duration="1210000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="88511000" />
+    <option name="totallyTimeSpent" value="88699000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -381,7 +384,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49646643" visible="true" weight="0.15991472" />
