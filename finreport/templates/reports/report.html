@@ -157,20 +157,20 @@
             </div>
 
             <div class="row">
-                {% for s in symbols if s in watchlist.columns %}
+                {% for symbol in symbols if symbol in watchlist.columns %}
                 <div class="col-md-6">
                     <div class="card card-chart">
                         <div class="card-header card-header-success">
                             <!--div class="ct-chart" id="dailySalesChart"></div-->
 {#                            {{ barchart }}#}
-                            <div id="kline_{{ s }}" style=" height:600px;"></div>
+                            <div id="kline_{{ symbol }}" style=" height:600px;"></div>
                             <script>
                                 $(
                                     function () {
-                                        var chart = echarts.init(document.getElementById('kline_{{ s }}'), 'white', {renderer: 'canvas'});
+                                        var chart = echarts.init(document.getElementById('kline_{{ symbol }}'), 'white', {renderer: 'canvas'});
                                         $.ajax({
                                             type: "GET",
-                                            url: "http://127.0.0.1:5000/report/klineChart/{{ s }}",
+                                            url: "http://127.0.0.1:5000/report/klineChart/{{ symbol }}",
                                             dataType: 'json',
                                             success: function (result) {
                                                 chart.setOption(result);
@@ -181,10 +181,14 @@
                             </script>
                         </div>
                         <div class="card-body">
-                            <h4 class="card-title">Daily Sales</h4>
+                            <h4 class="card-title">Daily CheckPoint</h4>
+                            {% for key in checklist.get(symbol).keys() %}
                             <p class="card-category">
-                                <span class="text-success"><i class="fa fa-long-arrow-up"></i> 55% </span> increase in
-                                today sales.</p>
+                                <span class="{{ "text-success" if checklist.get(symbol).get(key).count("-") < 1 else "text-warning" }}"> {{ key }} =>
+                                    <i class="fa {{ "fa-long-arrow-up" if checklist.get(symbol).get(key).count("-") < 1 else "fa-long-arrow-down" }}"></i> {{ checklist.get(symbol).get(key) }}
+                                </span>
+                            </p>
+                            {% endfor %}
                         </div>
                         <div class="card-footer">
                             <div class="stats">

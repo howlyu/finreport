@@ -7,11 +7,15 @@ from pyecharts_v12.charts import Bar, Kline, Grid
 from pyecharts_v12.options import global_options as gopts
 from pyecharts_v12.options import series_options as sopts
 import numpy as np
+import talib
+from .. import settings
 
-symbols = ['^gspc', 'wbai', 'tsla', 'estc', 'lite']
+# symbols = [ 'wbai', 'tsla', 'estc', 'cldr']#'^gspc',
+symbols = [i.strip() for i in settings.SYMBOLS.split(",")]
 today = date.today()
 startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
 enddate = (today - timedelta(days=1)).strftime("%Y-%m-%d")
+
 
 
 def getWatchlist(source='qa'):
@@ -21,7 +25,7 @@ def getWatchlist(source='qa'):
 		return perf.stats
 	else:
 		data = getDataFromQA([s.upper() for s in symbols], startdate, enddate)
-		tdata = transQAToFfn(data)
+		tdata = transQAToFFN(data)
 		tdata.columns = map(str.lower, tdata.columns)
 		perf = ffn.calc_stats(tdata)
 		# print(perf.stats)
@@ -29,7 +33,7 @@ def getWatchlist(source='qa'):
 
 
 def getDataFromQA(symbols, startdate, enddate):
-	return QA.QA_fetch_stock_day_adv(symbols, startdate, enddate)
+	return QA.QA_fetch_stock_day_adv(symbols, startdate, enddate).to_pd().reset_index().set_index("date")
 
 
 def getDataFromFFN(symbols, startdate, enddate):
@@ -37,21 +41,18 @@ def getDataFromFFN(symbols, startdate, enddate):
 
 
 def getSymbolList():
-	return [s.replace("^", "") for s in symbols]
+	return ffn.utils.clean_tickers(symbols)
 
 
-'''
-	Transform QAData to FFN data 
-	return dataframe
-'''
-
-
-def transQAToFfn(QAData):
-	data = QAData.to_pd().close.reset_index().set_index("date")
+def transQAToFFN(QAData):
+	'''
+		Transform QAData to FFN data
+		return dataframe
+	'''
 	frame = {}
-	symbols = data.code.unique()
+	symbols = QAData.code.unique()
 	for s in symbols:
-		frame.update({s: data[data.code == s].close})
+		frame.update({s: QAData[QAData.code == s].close})
 	return pd.DataFrame(frame)
 
 
@@ -63,8 +64,7 @@ def formatToFloat(arr):
 
 
 def getKlineBySymbol(symbol="TSLA") -> Grid:
-	data = getDataFromQA(symbol.upper(), startdate=startdate, enddate=enddate).to_pd()
-	data = data.reset_index().set_index("date")
+	data = getDataFromQA(symbol.upper(), startdate=startdate, enddate=enddate)
 	datetime = [i.strftime("%Y-%m-%d") for i in data.index]
 	ohlc = formatToFloat(np.array(data.loc[:, ['open', 'close', 'low', 'high']]))
 	vol = [v for v in data.volume]
@@ -114,4 +114,48 @@ def getKlineBySymbol(symbol="TSLA") -> Grid:
 
 	return grid
 
-# print(getWatchlist())
+def checklistStats(symbol="TSLA"):
+	startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
+	# today_90d = (today - timedelta(days=90)).strftime("%Y-%m-%d")
+	data = getDataFromQA(symbol.upper(), startdate=startdate, enddate=enddate)
+
+	# tdata = data.loc[:, ['open', 'close', 'low', 'high']]
+	desc = [
+		('1_1', 'price', '(current - lowest)/lowest = (10%, 15%) '),
+		('1_2', 'price', '(current - highest)/highest = (10%, 15%)'),
+		('1_3', 'price', 'W52 highest < current'),
+		('1_4', 'price', 'MA(18) > MA(22)'),
+		('1_5', 'price', 'MA(250) > current in BULL | MA(250) < current in BEAR'),
+		('2_1', 'volume', 'MA(22) : current'),
+	]
+	close = np.array(data.close)
+	volume = np.array([float(v) for v in data.volume])
+	current_close, min_close, max_close = close[-1], min(close), max(close)
+	current_vol, min_vol, max_vol = volume[-1], min(volume), max(volume)
+	volume_sma = talib.SMA(volume)
+	close_sma18 = talib.SMA(close, timeperiod=18)
+	close_sma22 = talib.SMA(close, timeperiod=22)
+	close_sma250 = talib.SMA(close, timeperiod=250)
+
+	cp11 = "{0:.2%}".format((current_close - min_close) / min_close)
+	cp12 = "{0:.2%}".format((current_close - max_close) / max_close)
+	cp13 = "W52 highest = {0:.2f}, current = {1:.2f}, delta={2:.02f}".format(max_close, close[-1], max_close - close[-1])
+	cp14 = "MA(18) = {0:.2f}, MA(22) = {1:.2f}, delta={2:.02f}".format(close_sma18[-1], close_sma22[-1], close_sma18[-1] - close_sma22[-1] )
+	cp15 = "MA(250) = {0:.2f}, current = {1:.2f}, delta={2:.02f}".format(close_sma250[-1], close[-1], close_sma250[-1] - close[-1])
+	cp21 = "MA(22) = {0:,.0f}, current = {1:,.0f}, delta = {2:.2%}".format(volume_sma[-1], volume[-1], (volume[-1] - volume_sma[-1])/volume_sma[-1])
+
+
+	result = {
+		'1_1' : cp11,
+		'1_2' : cp12,
+		'1_3' : cp13,
+		'1_4' : cp14,
+		'1_5' : cp15,
+		'2_1' : cp21,
+	}
+	return result
+
+def checklistStatsAll() -> dict:
+	return {s:checklistStats(s) for s in getSymbolList()}
+
+# print(talib.EMA([1,2,3,4,4,5,12,12]))

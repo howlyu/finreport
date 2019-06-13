@@ -12,7 +12,7 @@ blueprint = Blueprint('report', __name__, url_prefix='/report')
 def finReport():
 	return render_template('reports/report.html', watchlist=microdata.getWatchlist(source='qa'),
 	                       symbols=microdata.getSymbolList(),
-	                       barchart=Markup(microdata.getKlineBySymbol().render_embed()))
+	                       checklist=microdata.checklistStatsAll())
 
 @blueprint.route("klineChart/<symbol>")
 def getKlineChart(symbol=None):

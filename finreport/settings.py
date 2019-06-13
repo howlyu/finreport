@@ -12,3 +12,5 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='octocat')
 GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')
 GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+SYMBOLS = os.getenv('SYMBOLS', default='wbai, tsla')
