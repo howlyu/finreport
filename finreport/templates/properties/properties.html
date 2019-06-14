@@ -1,0 +1,60 @@
+{% extends "layouts/layout.html" %}
+{% block title %} Properties {% endblock %}
+{% block header %}
+    {{ super() }}
+{% endblock %}
+{% block nav_properties %}active{% endblock %}
+{% block content %}
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12 col-md-12">
+                    <div class="card">
+                        <div class="card-header card-header-info">
+                            <h4 class="card-title"><i class="material-icons">visibility</i> Presale List</h4>
+                            <p class="card-category">all the presale in SHENZHEN</p>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light text-center">
+                                <th>Enterprise</th>
+                                <th>Building</th>
+                                <th>Location</th>
+                                <th>District</th>
+                                <th>Licese</th>
+                                <th>AddDate</th>
+                                </thead>
+                                <tbody>
+                                {% for p in presale_list %}
+                                    <tr>
+                                        <td class="td-name text-center">{{ p.enterprise }}</td>
+                                        <td class="td-name text-center">
+                                            {{ p.building }}
+                                        </td>
+                                        <td class="td-name text-center">
+                                            {{ p.location }}
+                                        </td>
+                                        <td class="td-total text-center">
+                                            {{ p.district }}
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <a class="nav-link active"
+                                               href="https://amr.sz.gov.cn/0501W/Iframe/LicItemIframe.aspx?licId={{ p.licese }}"
+                                               target="_blank">
+                                                <i class="material-icons">more_horiz</i>
+                                            </a>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            {{ p.add_date }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

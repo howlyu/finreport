@@ -11,16 +11,22 @@
     </div>
     <div class="sidebar-wrapper">
         <ul class="nav">
-            <li class="nav-item active  ">
+            <li class="nav-item {% block nav_mirco %}{% endblock %}  ">
                 <a class="nav-link" href="/report/">
                     <i class="material-icons">memory</i>
                     <p>Mirco Trend</p>
                 </a>
             </li>
-            <li class="nav-item ">
+            <li class="nav-item {% block nav_macro %}{% endblock %}">
                 <a class="nav-link" href="/">
                     <i class="material-icons">dashboard</i>
                     <p>Marco Trend</p>
+                </a>
+            </li>
+            <li class="nav-item {% block nav_properties %}{% endblock %}">
+                <a class="nav-link" href="/properties/">
+                    <i class="material-icons">home</i>
+                    <p>Properties</p>
                 </a>
             </li>
         </ul>

@@ -14,3 +14,4 @@ GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 SYMBOLS = os.getenv('SYMBOLS', default='wbai, tsla')
+MONGODB_URI = os.getenv("MONGODB_URI", default='mongodb://127.0.0.1:27017/properties')
