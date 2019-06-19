@@ -158,46 +158,86 @@
             </div>
 
             <div class="row">
+                <script type="text/javascript">
+                    function showCheckPoint(symbol, interval) {
+                        let today = new Date();
+                        {#let start = today.getFullYear() + "-" + today.getMonth() + "-" + today.getDate();#}
+                        let end = today.toISOString().slice(0, 10);
+                        var interval_day = new Date();
+                        interval_day.setDate(interval_day.getDate() + interval);
+                        let start = interval_day.toISOString().slice(0, 10);
+                        {#alert('http://127.0.0.1:5000/report/checkpointStat/'+ symbol +'/'+start+'/'+end)#}
+                        $.ajax({
+                            type: "GET",
+                            {#url: "{{ url_for('report.showCheckPoint', symbol = symbol, start="2019-05-17", end="2019-06-17") }}",#}
+                            url: 'http://127.0.0.1:5000/report/checkpointStat/' + symbol + '/' + start + '/' + end,
+                            success: function (data) {
+                                data = JSON.parse(data);
+                                Object.keys(data).forEach(function (key) {
+                                    {#alert(data[k])#}
+                                    $("#card-body-content-"+symbol+"-" + key).text(data[key])
+                                });
+                            },
+                        });
+                    }
+                </script>
                 {% for symbol in symbols if symbol in watchlist.columns %}
-                <div class="col-md-6">
-                    <div class="card card-chart">
-                        <div class="card-header card-header-success">
-                            <!--div class="ct-chart" id="dailySalesChart"></div-->
-{#                            {{ barchart }}#}
-                            <div id="kline_{{ symbol }}" style=" height:600px;"></div>
-                            <script>
-                                $(
-                                    function () {
-                                        var chart = echarts.init(document.getElementById('kline_{{ symbol }}'), 'white', {renderer: 'canvas'});
-                                        $.ajax({
-                                            type: "GET",
-                                            url: "http://127.0.0.1:5000/report/klineChart/{{ symbol }}",
-                                            dataType: 'json',
-                                            success: function (result) {
-                                                chart.setOption(result);
-                                            }
-                                        });
-                                    }
-                                )
-                            </script>
-                        </div>
-                        <div class="card-body">
-                            <h4 class="card-title">Daily CheckPoint</h4>
-                            {% for key in checklist.get(symbol).keys() %}
-                            <p class="card-category">
-                                <span class="{{ "text-success" if checklist.get(symbol).get(key).count("-") < 1 else "text-warning" }}"> {{ key }} =>
-                                    <i class="fa {{ "fa-long-arrow-up" if checklist.get(symbol).get(key).count("-") < 1 else "fa-long-arrow-down" }}"></i> {{ checklist.get(symbol).get(key) }}
-                                </span>
-                            </p>
-                            {% endfor %}
-                        </div>
-                        <div class="card-footer">
-                            <div class="stats">
-                                <i class="material-icons">access_time</i> updated 4 minutes ago
+                    <div class="col-md-6">
+                        <div class="card card-chart">
+                            <div class="card-header card-header-success">
+                                <div id="kline_{{ symbol }}" style=" height:600px;"></div>
+                                <script>
+                                    $(
+                                        function () {
+                                            var chart = echarts.init(document.getElementById('kline_{{ symbol }}'), 'white', {renderer: 'canvas'});
+                                            $.ajax({
+                                                type: "GET",
+                                                url: "{{ url_for('report.getKlineChart', symbol = symbol) }}",
+                                                dataType: 'json',
+                                                success: function (result) {
+                                                    chart.setOption(result);
+                                                }
+                                            });
+                                        }
+                                    )
+                                </script>
+                            </div>
+                            <div class="card-body">
+                                <h4 class="card-title">Daily CheckPoint
+                                    <button type="button" rel="tooltip" title="Date Selector"
+                                            class="btn btn-primary btn-link btn-sm" style="color:black "
+                                            onclick="return showCheckPoint('{{ symbol }}', -45);">
+                                        <i class="material-icons">refresh</i> 1.5M
+                                    </button>
+                                    <button type="button" rel="tooltip" title="Date Selector"
+                                            class="btn btn-primary btn-link btn-sm" style="color:black"
+                                            onclick="return showCheckPoint('{{ symbol }}',-90);">
+                                        <i class="material-icons">refresh</i> 3M
+                                    </button>
+                                    <button type="button" rel="tooltip" title="Date Selector"
+                                            class="btn btn-primary btn-link btn-sm" style="color:black "
+                                            onclick="return showCheckPoint('{{ symbol }}',-180);">
+                                        <i class="material-icons">refresh</i> 6M
+                                    </button>
+                                </h4>
+                                <div id="card-body-content-{{ symbol }}">
+                                    {% for key in checklist.get(symbol).keys() %}
+                                        <p class="card-category">
+                                        <span id="card-body-content-{{ symbol }}-{{ key }}"
+                                              class="{{ "text-success" if checklist.get(symbol).get(key).count("-") < 1 else "text-warning" }}"> {{ key }} =>
+                                            <i class="fa {{ "fa-long-arrow-up" if checklist.get(symbol).get(key).count("-") < 1 else "fa-long-arrow-down" }}"></i> {{ checklist.get(symbol).get(key) }}
+                                        </span>
+                                        </p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="stats">
+                                    <i class="material-icons">access_time</i> updated 4 minutes ago
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 {% endfor %}
             </div>
 
