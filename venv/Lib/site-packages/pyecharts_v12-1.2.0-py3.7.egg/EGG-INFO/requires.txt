@@ -1,0 +1,11 @@
+jinja2
+prettytable
+
+[images]
+PIL
+
+[phantomjs]
+snapshot-phantomjs
+
+[selenium]
+snapshot-selenium
