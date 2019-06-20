@@ -13,13 +13,12 @@ from .. import settings
 
 # symbols = [ 'wbai', 'tsla', 'estc', 'cldr']#'^gspc',
 symbols = [i.strip() for i in settings.SYMBOLS.split(",")]
-today = date.today()
-startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
-enddate = (today - timedelta(days=1)).strftime("%Y-%m-%d")
-
 
 
 def getWatchlist(source='qa'):
+	today = date.today()
+	startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
+	enddate = (today - timedelta(days=1)).strftime("%Y-%m-%d")
 	if source == 'ffn':
 		data = getDataFromFFN(','.join(symbols), startdate, enddate)
 		perf = data.calc_stats()
@@ -59,12 +58,15 @@ def transQAToFFN(QAData):
 
 def formatToFloat(arr):
 	res = []
-	for row in arr :
+	for row in arr:
 		res.append(["{0:.2f}".format(r) for r in row if r != "nan"])
 	return res
 
 
 def getKlineBySymbol(symbol="TSLA") -> Grid:
+	today = date.today()
+	startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
+	enddate = (today - timedelta(days=1)).strftime("%Y-%m-%d")
 	data = getDataFromQA(symbol.upper(), startdate=startdate, enddate=enddate)
 	datetime = [i.strftime("%Y-%m-%d") for i in data.index]
 	ohlc = formatToFloat(np.array(data.loc[:, ['open', 'close', 'low', 'high']]))
@@ -99,21 +101,21 @@ def getKlineBySymbol(symbol="TSLA") -> Grid:
 		.set_global_opts(yaxis_opts=gopts.AxisOpts(is_scale=True),
 	                     xaxis_opts=gopts.AxisOpts(is_scale=True),
 	                     legend_opts=gopts.LegendOpts(is_show=False),
-                         title_opts=gopts.TitleOpts(title="{} ({} ~ {})".format(symbol.upper(), startdate, enddate))
+	                     title_opts=gopts.TitleOpts(title="{} ({} ~ {})".format(symbol.upper(), startdate, enddate))
 	                     )
 
-	sma_line = Line()\
-		.add_xaxis(datetime)\
+	sma_line = Line() \
+		.add_xaxis(datetime) \
 		.add_yaxis("sma18",
 	               sma18_close,
 	               is_connect_nones=False,
 	               is_symbol_show=False,
-                   is_smooth=True,
+	               is_smooth=True,
 	               linestyle_opts=gopts.LineStyleOpts(width=2,
 	                                                  color='#ff4500'),
-	               )\
+	               ) \
 		.add_yaxis("sma22",
-                   sma22_close,
+	               sma22_close,
 	               is_connect_nones=False,
 	               is_symbol_show=False,
 	               is_smooth=True,
@@ -140,16 +142,16 @@ def getKlineBySymbol(symbol="TSLA") -> Grid:
 	               linestyle_opts=gopts.LineStyleOpts(width=2,
 	                                                  color='#338AFF'
 	                                                  ),
-	               )\
+	               ) \
 		.add_yaxis("lower",
-	           bbands_lower_close,
-	           is_connect_nones=False,
-	           is_symbol_show=False,
-	           is_smooth=True,
-	           linestyle_opts=gopts.LineStyleOpts(width=2,
-	                                              color='#ff4500'
-	                                              ),
-	           )
+	               bbands_lower_close,
+	               is_connect_nones=False,
+	               is_symbol_show=False,
+	               is_smooth=True,
+	               linestyle_opts=gopts.LineStyleOpts(width=2,
+	                                                  color='#ff4500'
+	                                                  ),
+	               )
 
 	kline.overlap(bbands_line)
 
@@ -157,9 +159,9 @@ def getKlineBySymbol(symbol="TSLA") -> Grid:
 		.add_xaxis(datetime) \
 		.add_yaxis("volume", vol) \
 		.set_series_opts(
-			label_opts=sopts.LabelOpts(is_show=False),
+		label_opts=sopts.LabelOpts(is_show=False),
 
-		)\
+	) \
 		.set_global_opts(datazoom_opts=gopts.DataZoomOpts(xaxis_index=[0, 1],
 	                                                      is_show=True,
 	                                                      range_start=75,
@@ -167,21 +169,26 @@ def getKlineBySymbol(symbol="TSLA") -> Grid:
 	                     legend_opts=gopts.LegendOpts(is_show=False),
 	                     yaxis_opts=gopts.AxisOpts(is_show=False))
 
-	grid = Grid()#init_opts=gopts.InitOpts(width="800px", height="600px")
+	grid = Grid()  # init_opts=gopts.InitOpts(width="800px", height="600px")
 	grid.add(bar, grid_opts=gopts.GridOpts(pos_top="85%"))
 	grid.add(kline, grid_opts=gopts.GridOpts(pos_bottom="20%"))
 
 	return grid
 
-def checklistStats(symbol="TSLA", start=startdate, end=enddate) -> dict:
+
+def checklistStats(symbol="TSLA", start=(date.today() - timedelta(days=365)).strftime("%Y-%m-%d"),
+                   end=(date.today() - timedelta(days=1)).strftime("%Y-%m-%d")) -> dict:
 	'''
 	check all the point by symbol, then get the statistical data
 	:param symbol:
 	:return:tuple
 	'''
+	today = date.today()
 	startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
-	data = getDataFromQA(symbol.upper(), startdate=startdate, enddate=enddate) #chart data
-	data_cp = getDataFromQA(symbol.upper(), startdate=start, enddate=end) #chart data
+	enddate = (today - timedelta(days=1)).strftime("%Y-%m-%d")
+	# startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
+	data = getDataFromQA(symbol.upper(), startdate=startdate, enddate=enddate)  # chart data
+	data_cp = getDataFromQA(symbol.upper(), startdate=start, enddate=end)  # chart data
 
 	desc = [
 		('1_1', 'price', '(current - lowest)/lowest = (10%, 15%) '),
@@ -202,26 +209,33 @@ def checklistStats(symbol="TSLA", start=startdate, end=enddate) -> dict:
 	close_sma250 = talib.SMA(close, timeperiod=250)
 
 	total = "symbol={}, start={}, end={}".format(symbol, start, end)
-	cp11 = "current={0:.2f}, min_close={1:.2f}, delta={2:.2%}".format(current_close_cp, min_close_cp, (current_close_cp - min_close_cp) / min_close_cp)
-	cp12 = "current={0:.2f}, max_close={1:.2f}, delta={2:.2%}".format(current_close_cp, max_close_cp, (current_close_cp - max_close_cp) / max_close_cp)
-	cp13 = "W52 highest = {0:.2f}, current = {1:.2f}, delta={2:.02f}".format(max(close), close[-1], max(close) - close[-1])
-	cp14 = "MA(18) = {0:.2f}, MA(22) = {1:.2f}, delta={2:.02f}".format(close_sma18[-1], close_sma22[-1], close_sma18[-1] - close_sma22[-1] )
-	cp15 = "MA(250) = {0:.2f}, current = {1:.2f}, delta={2:.02f}".format(close_sma250[-1], close[-1], close_sma250[-1] - close[-1])
-	cp21 = "MA(22) = {0:,.0f}, current = {1:,.0f}, delta = {2:.2%}".format(volume_sma[-1], volume_cp[-1], (volume_cp[-1] - volume_sma[-1])/volume_sma[-1])
-
+	cp11 = "current={0:.2f}, min_close={1:.2f}, delta={2:.2%}".format(current_close_cp, min_close_cp,
+	                                                                  (current_close_cp - min_close_cp) / min_close_cp)
+	cp12 = "current={0:.2f}, max_close={1:.2f}, delta={2:.2%}".format(current_close_cp, max_close_cp,
+	                                                                  (current_close_cp - max_close_cp) / max_close_cp)
+	cp13 = "W52 highest = {0:.2f}, current = {1:.2f}, delta={2:.02f}".format(max(close), close[-1],
+	                                                                         max(close) - close[-1])
+	cp14 = "MA(18) = {0:.2f}, MA(22) = {1:.2f}, delta={2:.02f}".format(close_sma18[-1], close_sma22[-1],
+	                                                                   close_sma18[-1] - close_sma22[-1])
+	cp15 = "MA(250) = {0:.2f}, current = {1:.2f}, delta={2:.02f}".format(close_sma250[-1], close[-1],
+	                                                                     close_sma250[-1] - close[-1])
+	cp21 = "MA(22) = {0:,.0f}, current = {1:,.0f}, delta = {2:.2%}".format(volume_sma[-1], volume_cp[-1],
+	                                                                       (volume_cp[-1] - volume_sma[-1]) /
+	                                                                       volume_sma[-1])
 
 	result = {
 		'total': total,
-		'1_1' : cp11,
-		'1_2' : cp12,
-		'1_3' : cp13,
-		'1_4' : cp14,
-		'1_5' : cp15,
-		'2_1' : cp21,
+		'1_1': cp11,
+		'1_2': cp12,
+		'1_3': cp13,
+		'1_4': cp14,
+		'1_5': cp15,
+		'2_1': cp21,
 	}
 	return result
 
+
 def checklistStatsAll() -> dict:
-	return {s:checklistStats(s) for s in getSymbolList()}
+	return {s: checklistStats(s) for s in getSymbolList()}
 
 # print(talib.EMA([1,2,3,4,4,5,12,12]))
