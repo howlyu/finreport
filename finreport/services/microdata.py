@@ -1,34 +1,46 @@
 # -*- coding: utf-8 -*-
-import pandas as pd
+import os
+from datetime import date, timedelta
+
 import QUANTAXIS as QA
 import ffn
-from datetime import date, timedelta
+import numpy as np
+import pandas as pd
+import talib
+from dotenv import load_dotenv
 from pyecharts_v12.charts import Bar, Kline, Grid, Line
 from pyecharts_v12.options import global_options as gopts
 from pyecharts_v12.options import series_options as sopts
-import numpy as np
-import talib
 from talib import MA_Type
-from .. import settings
 
-# symbols = [ 'wbai', 'tsla', 'estc', 'cldr']#'^gspc',
-symbols = [i.strip() for i in settings.SYMBOLS.split(",")]
+
+def getSymbolListFromSetting() -> list:
+	load_dotenv(override=True)
+	return [i.strip() for i in os.getenv('SYMBOLS', default='wbai, tsla').split(",")]
+
+
+def getDateFromSetting():
+	load_dotenv(override=True)
+	return (date.today() - timedelta(days=int(os.getenv('START_INTERVAL', default='365')))).strftime("%Y-%m-%d"), \
+	       (date.today() - timedelta(days=int(os.getenv('END_INTERVAL', default='1')))).strftime("%Y-%m-%d")
 
 
 def getWatchlist(source='qa'):
-	today = date.today()
-	startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
-	enddate = (today - timedelta(days=1)).strftime("%Y-%m-%d")
+	'''
+	get stats from all the symbols
+	:param source:
+	:return: stats
+	'''
+	startdate, enddate = getDateFromSetting()
 	if source == 'ffn':
-		data = getDataFromFFN(','.join(symbols), startdate, enddate)
+		data = getDataFromFFN(','.join(getSymbolListFromSetting()), startdate, enddate)
 		perf = data.calc_stats()
 		return perf.stats
 	else:
-		data = getDataFromQA([s.upper() for s in symbols], startdate, enddate)
+		data = getDataFromQA([s.upper() for s in getSymbolListFromSetting()], startdate=startdate, enddate=enddate)
 		tdata = transQAToFFN(data)
 		tdata.columns = map(str.lower, tdata.columns)
 		perf = ffn.calc_stats(tdata)
-		# print(perf.stats)
 		return perf.stats
 
 
@@ -41,7 +53,7 @@ def getDataFromFFN(symbols, startdate, enddate):
 
 
 def getSymbolList():
-	return ffn.utils.clean_tickers(symbols)
+	return ffn.utils.clean_tickers(getSymbolListFromSetting())
 
 
 def transQAToFFN(QAData):
@@ -64,9 +76,12 @@ def formatToFloat(arr):
 
 
 def getKlineBySymbol(symbol="TSLA") -> Grid:
-	today = date.today()
-	startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
-	enddate = (today - timedelta(days=1)).strftime("%Y-%m-%d")
+	'''
+	generate the kline chart for each symbol
+	:param symbol:
+	:return: Grid Chart
+	'''
+	startdate, enddate = getDateFromSetting()
 	data = getDataFromQA(symbol.upper(), startdate=startdate, enddate=enddate)
 	datetime = [i.strftime("%Y-%m-%d") for i in data.index]
 	ohlc = formatToFloat(np.array(data.loc[:, ['open', 'close', 'low', 'high']]))
@@ -183,10 +198,7 @@ def checklistStats(symbol="TSLA", start=(date.today() - timedelta(days=365)).str
 	:param symbol:
 	:return:tuple
 	'''
-	today = date.today()
-	startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
-	enddate = (today - timedelta(days=1)).strftime("%Y-%m-%d")
-	# startdate = (today - timedelta(days=365)).strftime("%Y-%m-%d")
+	startdate, enddate = getDateFromSetting()
 	data = getDataFromQA(symbol.upper(), startdate=startdate, enddate=enddate)  # chart data
 	data_cp = getDataFromQA(symbol.upper(), startdate=start, enddate=end)  # chart data
 
