@@ -86,66 +86,132 @@
                         <div class="card-body table-responsive">
                             <table class="table table-hover">
                                 <thead class="thead-light text-center">
-                                <th >Symbol</th>
-                                <th >start</th>
-                                <th >end</th>
-                                <th >total_return</th>
-                                <th >max_drawdown</th>
-                                <th >mtd</th>
-                                <th >three_month</th>
-                                <th >six_month</th>
-                                <th >ytd</th>
-                                <th >best_day</th>
-                                <th >worst_day</th>
+                                <th>Symbol</th>
+                                <th>start</th>
+                                <th>end</th>
+                                <th>total_return</th>
+                                <th>cagr</th>
+                                <th>max_drawdown</th>
+                                <th>calmar</th>
+                                <th>mtd</th>
+                                <th>three_month</th>
+                                <th>six_month</th>
+                                <th>ytd</th>
+                                <th>one_year</th>
+                                <th>best_day</th>
+                                <th>worst_day</th>
+                                <th>best_month</th>
+                                <th>worst_month</th>
+                                <th>avg_drawdown</th>
+                                <th>avg_drawdown_days</th>
+                                <th>avg_up_month</th>
+                                <th>avg_down_month</th>
+                                <th>win_year_perc</th>
+                                <th>twelve_month_win_perc</th>
                                 </thead>
                                 <tbody>
-                                {% for s in symbols if s in watchlist.columns%}
+                                {% for symbol in symbols if symbol in watchlist.columns %}
                                     <tr>
-                                        <td class="td-name text-center">{{ s }}</td>
+                                        <td class="td-name text-center">{{ symbol }}</td>
                                         <td class="td-name text-center">
-                                            {{ watchlist[s].start.strftime('%Y-%m-%d') }}
+                                            {{ watchlist[symbol].start.strftime('%Y-%m-%d') }}
                                         </td>
                                         <td class="td-name text-center">
-                                            {{ watchlist[s].end.strftime('%Y-%m-%d') }}
+                                            {{ watchlist[symbol].end.strftime('%Y-%m-%d') }}
                                         </td>
                                         <td class="td-total text-center">
-                                            <span class="{{ "text-success" if watchlist[s].total_return >=0 else "text-rose"}}">
-                                                {{ "%.2f"|format(watchlist[s].total_return*100) }}%
+                                            <span class="{{ "text-success" if watchlist[symbol].total_return >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].total_return*100) }}%
                                             </span>
                                         </td>
                                         <td class="td-total text-center">
-                                            <span class="{{ "text-success" if watchlist[s].max_drawdown >=0 else "text-rose"}}">
-                                                {{ "%.2f"|format(watchlist[s].max_drawdown*100) }}%
+                                            <span class="{{ "text-success" if watchlist[symbol].cagr >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].cagr*100) }}%
                                             </span>
                                         </td>
                                         <td class="td-total text-center">
-                                            <span class="{{ "text-success" if watchlist[s].mtd >=0 else "text-rose"}}">
-                                                {{ "%.2f"|format(watchlist[s].mtd*100) }}%
+                                            <span class="{{ "text-success" if watchlist[symbol].max_drawdown >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].max_drawdown*100) }}%
                                             </span>
                                         </td>
                                         <td class="td-total text-center">
-                                            <span class="{{ "text-success" if watchlist[s].three_month >=0 else "text-rose"}}">
-                                                {{ "%.2f"|format(watchlist[s].three_month*100) }}%
+                                            <span class="{{ "text-info" if watchlist[symbol].calmar >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].calmar) }}
                                             </span>
                                         </td>
                                         <td class="td-total text-center">
-                                            <span class="{{ "text-success" if watchlist[s].six_month >=0 else "text-rose"}}">
-                                                {{ "%.2f"|format(watchlist[s].six_month*100) }}%
+                                            <span class="{{ "text-success" if watchlist[symbol].mtd >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].mtd*100) }}%
                                             </span>
                                         </td>
                                         <td class="td-total text-center">
-                                            <span class="{{ "text-success" if watchlist[s].ytd >=0 else "text-rose"}}">
-                                                {{ "%.2f"|format(watchlist[s].ytd*100) }}%
+                                            <span class="{{ "text-success" if watchlist[symbol].three_month >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].three_month*100) }}%
                                             </span>
                                         </td>
                                         <td class="td-total text-center">
-                                            <span class="{{ "text-success" if watchlist[s].best_day >=0 else "text-rose"}}">
-                                                {{ "%.2f"|format(watchlist[s].best_day*100) }}%
+                                            <span class="{{ "text-success" if watchlist[symbol].six_month >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].six_month*100) }}%
                                             </span>
                                         </td>
                                         <td class="td-total text-center">
-                                            <span class="{{ "text-success" if watchlist[s].worst_day >=0 else "text-rose"}}">
-                                                {{ "%.2f"|format(watchlist[s].worst_day*100) }}%
+                                            <span class="{{ "text-success" if watchlist[symbol].ytd >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].ytd*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].one_year >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].one_year*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].best_day >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].best_day*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].worst_day >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].worst_day*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].best_month >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].best_month*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].worst_month >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].worst_month*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].avg_drawdown >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].avg_drawdown*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="text-info">
+                                                {{ "%.0f"|format(watchlist[symbol].avg_drawdown_days) }}
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].avg_up_month >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].avg_up_month*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].avg_down_month >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].avg_down_month*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].win_year_perc >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].win_year_perc*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-success" if watchlist[symbol].twelve_month_win_perc >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].twelve_month_win_perc*100) }}%
                                             </span>
                                         </td>
                                     </tr>
@@ -175,7 +241,7 @@
                                 data = JSON.parse(data);
                                 Object.keys(data).forEach(function (key) {
                                     {#alert(data[k])#}
-                                    $("#card-body-content-"+symbol+"-" + key).text(data[key])
+                                    $("#card-body-content-" + symbol + "-" + key).text(data[key])
                                 });
                             },
                         });
