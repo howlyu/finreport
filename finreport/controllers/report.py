@@ -12,8 +12,7 @@ blueprint = Blueprint('report', __name__, url_prefix='/report')
 @blueprint.route('/')
 def finReport():
 	return render_template('reports/report.html', watchlist=microdata.getWatchlist(source='qa'),
-	                       symbols=microdata.getSymbolList(),
-	                       checklist=microdata.checklistStatsAll())
+	                       symbols=microdata.getSymbolList())
 
 @blueprint.route("klineChart/<string:symbol>")
 def getKlineChart(symbol=None):
@@ -21,6 +20,9 @@ def getKlineChart(symbol=None):
 
 @blueprint.route("checkpointStat/<string:symbol>/<string:start>/<string:end>")
 def showCheckPoint(symbol=None, start=None, end=None):
-	# return microdata.checklistStats(symbol=symbol).__str__()
-	print(start, end, symbol)
-	return json.dumps(microdata.checklistStats(symbol=symbol, start=start, end=end))
+	# return json.dumps(microdata.checklistStats(symbol=symbol, start=start, end=end))
+	return render_template("reports/report_checklist.html",
+	                       symbol=symbol,
+	                       start=start,
+	                       end=end,
+	                       result=microdata.checklistStats(symbol=symbol, start=start, end=end))

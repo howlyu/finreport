@@ -1,0 +1,36 @@
+<div class="tab-content">
+    <div class="tab-pane active" id="profile">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td colspan="3" class="font-weight-bold h4 text-center">
+                        &bigstar;&nbsp;{{- symbol|upper -}}&nbsp;&#40;&nbsp;{{- start -}} &nbsp;&#126;&nbsp; {{- end -}}&nbsp;&#41;&nbsp;&bigstar;
+                    </td>
+                </tr>
+                {% for index, row in result.iterrows() %}
+                    <tr class="{{ "text-danger" if row.signal else "text-default" }}">
+                        <td>
+                            <span >
+                                <i class="material-icons">
+                                    {% if row.delta.count('-') >0 %}
+                                        trending_down
+                                    {% elif row.signal %}
+                                        trending_up
+                                    {% else %}
+                                        trending_flat
+                                    {% endif %}
+                                </i>
+                             </span>
+                        </td>
+                        <td class="text-center">
+                            {{- row.desc -}}
+                        </td>
+                        <td class="text-right {{ "h3 font-weight-bold" if row.signal}} ">
+                            {{- row.delta -}}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

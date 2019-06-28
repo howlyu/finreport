@@ -192,11 +192,11 @@ def getKlineBySymbol(symbol="TSLA") -> Grid:
 
 
 def checklistStats(symbol="TSLA", start=(date.today() - timedelta(days=365)).strftime("%Y-%m-%d"),
-                   end=(date.today() - timedelta(days=1)).strftime("%Y-%m-%d")) -> dict:
+                   end=(date.today() - timedelta(days=1)).strftime("%Y-%m-%d")) -> pd.DataFrame:
 	'''
 	check all the point by symbol, then get the statistical data
 	:param symbol:
-	:return:tuple
+	:return:DataFrame
 	'''
 	startdate, enddate = getDateFromSetting()
 	data = getDataFromQA(symbol.upper(), startdate=startdate, enddate=enddate)  # chart data
@@ -210,44 +210,36 @@ def checklistStats(symbol="TSLA", start=(date.today() - timedelta(days=365)).str
 		('1_5', 'price', 'MA(250) > current in BULL | MA(250) < current in BEAR'),
 		('2_1', 'volume', 'MA(22) : current'),
 	]
+	df = pd.DataFrame(columns=['id','signal','desc','delta'],
+	                  index=['11','12','13','14','15','21'])
 	close = np.array(data.close)
 	close_cp = np.array(data_cp.close)
 	volume_cp = np.array([float(v) for v in data_cp.volume])
 	current_close_cp, min_close_cp, max_close_cp = close_cp[-1], min(close_cp), max(close_cp)
 	current_vol_cp, min_vol, max_vol = volume_cp[-1], min(volume_cp), max(volume_cp)
-	volume_sma = talib.SMA(volume_cp)
-	close_sma18 = talib.SMA(close, timeperiod=18)
-	close_sma22 = talib.SMA(close, timeperiod=22)
-	close_sma250 = talib.SMA(close, timeperiod=250)
+	volume_ema = talib.EMA(volume_cp)
+	close_ema18 = talib.EMA(close, timeperiod=18)
+	close_ema22 = talib.EMA(close, timeperiod=22)
+	close_ema250 = talib.EMA(close, timeperiod=250)
 
-	total = "symbol={}, start={}, end={}".format(symbol, start, end)
-	cp11 = "current={0:.2f}, min_close={1:.2f}, delta={2:.2%}".format(current_close_cp, min_close_cp,
-	                                                                  (current_close_cp - min_close_cp) / min_close_cp)
-	cp12 = "current={0:.2f}, max_close={1:.2f}, delta={2:.2%}".format(current_close_cp, max_close_cp,
-	                                                                  (current_close_cp - max_close_cp) / max_close_cp)
-	cp13 = "W52 highest = {0:.2f}, current = {1:.2f}, delta={2:.02f}".format(max(close), close[-1],
-	                                                                         max(close) - close[-1])
-	cp14 = "MA(18) = {0:.2f}, MA(22) = {1:.2f}, delta={2:.02f}".format(close_sma18[-1], close_sma22[-1],
-	                                                                   close_sma18[-1] - close_sma22[-1])
-	cp15 = "MA(250) = {0:.2f}, current = {1:.2f}, delta={2:.02f}".format(close_sma250[-1], close[-1],
-	                                                                     close_sma250[-1] - close[-1])
-	cp21 = "MA(22) = {0:,.0f}, current = {1:,.0f}, delta = {2:.2%}".format(volume_sma[-1], volume_cp[-1],
-	                                                                       (volume_cp[-1] - volume_sma[-1]) /
-	                                                                       volume_sma[-1])
+	delta11 = (current_close_cp - min_close_cp) / min_close_cp
+	cp11 = "current={0:.2f}, min_close={1:.2f}".format(current_close_cp, min_close_cp)
+	delta12 = (current_close_cp - max_close_cp) / max_close_cp
+	cp12 = "current={0:.2f}, max_close={1:.2f}".format(current_close_cp, max_close_cp)
+	delta13 = max(close) - close[-1]
+	cp13 = "W52 highest = {0:.2f}, current = {1:.2f}".format(max(close), close[-1])
+	delta14 = close_ema18[-1] - close_ema22[-1]
+	cp14 = "EMA(18) = {0:.2f}, EMA(22) = {1:.2f}".format(close_ema18[-1], close_ema22[-1])
+	delta15 = close_ema250[-1] - close[-1]
+	cp15 = "EMA(250) = {0:.2f}, current = {1:.2f}".format(close_ema250[-1], close[-1])
+	delta21 = (volume_cp[-1] - volume_ema[-1]) / volume_ema[-1]
+	cp21 = "EMA(22) = {0:,.0f}, current = {1:,.0f} ".format(volume_ema[-1], volume_cp[-1])
 
-	result = {
-		'total': total,
-		'1_1': cp11,
-		'1_2': cp12,
-		'1_3': cp13,
-		'1_4': cp14,
-		'1_5': cp15,
-		'2_1': cp21,
-	}
-	return result
+	df.loc['11'] = ['11', delta11 >= 0.1, cp11, "delta={:.2%}".format(delta11)]
+	df.loc['12'] = ['12', delta12 <= -0.1, cp12, "delta={:.2%}".format(delta12)]
+	df.loc['13'] = ['13', delta13 <= 0, cp13, "delta={:.02f}".format(delta13)]
+	df.loc['14'] = ['14', delta14 >= 0, cp14, "delta={:.02f}".format(delta14)]
+	df.loc['15'] = ['15', delta15 <= 0, cp15, "delta={:.02f}".format(delta15)]
+	df.loc['21'] = ['21', delta21 >= 0.2, cp21, "delta={:.2%}".format(delta21)]
 
-
-def checklistStatsAll() -> dict:
-	return {s: checklistStats(s) for s in getSymbolList()}
-
-# print(talib.EMA([1,2,3,4,4,5,12,12]))
+	return df
