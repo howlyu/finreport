@@ -1,4 +1,4 @@
 """Controllers package"""
 from . import home
 from . import report
-from . import properties
+from . import realestate

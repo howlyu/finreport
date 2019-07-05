@@ -18,7 +18,7 @@ def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(controllers.home.blueprint)
     app.register_blueprint(controllers.report.blueprint)
-    app.register_blueprint(controllers.properties.buleprint)
+    app.register_blueprint(controllers.realestate.buleprint)
     return None
 
 def register_errorhandlers(app):

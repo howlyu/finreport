@@ -16,4 +16,4 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 SYMBOLS = os.getenv('SYMBOLS', default='wbai, tsla')
 START_INTERVAL = os.getenv('START_INTERVAL', default='365')
 END_INTERVAL = os.getenv('END_INTERVAL', default='1')
-MONGODB_URI = os.getenv("MONGODB_URI", default='mongodb://127.0.0.1:27017/properties')
+MONGODB_URI = os.getenv("MONGODB_URI", default='mongodb://127.0.0.1:27017/realestate')
