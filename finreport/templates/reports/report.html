@@ -100,8 +100,12 @@
                                 <th>one_year</th>
                                 <th>best_day</th>
                                 <th>worst_day</th>
+                                <th>daily_sharpe</th>
+                                <th>daily_sortino</th>
                                 <th>best_month</th>
                                 <th>worst_month</th>
+                                <th>monthly_sharpe</th>
+                                <th>monthly_sortino</th>
                                 <th>avg_drawdown</th>
                                 <th>avg_drawdown_days</th>
                                 <th>avg_up_month</th>
@@ -179,6 +183,16 @@
                                             </span>
                                         </td>
                                         <td class="td-total text-center">
+                                            <span class="{{ "text-info" if watchlist[symbol].daily_sharpe >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].daily_sharpe) }}
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-info" if watchlist[symbol].daily_sortino >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].daily_sortino) }}
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
                                             <span class="{{ "text-success" if watchlist[symbol].best_month >=0 else "text-rose" }}">
                                                 {{ "%.2f"|format(watchlist[symbol].best_month*100) }}%
                                             </span>
@@ -186,6 +200,16 @@
                                         <td class="td-total text-center">
                                             <span class="{{ "text-success" if watchlist[symbol].worst_month >=0 else "text-rose" }}">
                                                 {{ "%.2f"|format(watchlist[symbol].worst_month*100) }}%
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-info" if watchlist[symbol].monthly_sharpe >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].monthly_sharpe) }}
+                                            </span>
+                                        </td>
+                                        <td class="td-total text-center">
+                                            <span class="{{ "text-info" if watchlist[symbol].monthly_sortino >=0 else "text-rose" }}">
+                                                {{ "%.2f"|format(watchlist[symbol].monthly_sortino) }}
                                             </span>
                                         </td>
                                         <td class="td-total text-center">
